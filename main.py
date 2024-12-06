@@ -1,7 +1,8 @@
 from sly import Lexer, Parser
 
 class MatemagicaLexer(Lexer):
-    reserved = ('SOME', 'COM', 'MULTIPLIQUE', 'POR', 'FACA', 'SER', 'REPITA', 'VEZES', 'FIM', 'SE', 'ENTAO', 'SENAO', 'MOSTRE', 'MAIOR', 'MENOR', 'QUE')
+    reserved = ('SOME', 'COM', 'MULTIPLIQUE', 'POR', 'FACA', 'SER', 'REPITA', 'VEZES',
+                'FIM', 'SE', 'ENTAO', 'SENAO', 'MOSTRE', 'MAIOR', 'MENOR', 'QUE')
     tokens = reserved + ('NUM', 'VAR', 'PONTO', 'DOIS_PONTOS')
     ignore = ' \t'
 
@@ -50,9 +51,9 @@ class MatemagicaParser(Parser):
     def repeticao(self, p):
         return f'for TEMP2 = 1, {p[1]} do'
     
-    @_('SE VAR ENTAO', 'SE NUM ENTAO')
+    @_('SE VAR ENTAO', 'SE NUM ENTAO', 'SE operacao ENTAO')
     def condicional(self, p):
-        return f'if not (({p[1]}) == 0) then'
+        return f'if not (({p[1][p[1].find("=")+1:]}) == 0) then'
     
     @_('SE VAR MAIOR QUE NUM ENTAO', 'SE VAR MAIOR QUE VAR ENTAO', 'SE NUM MAIOR QUE VAR ENTAO', 'SE NUM MAIOR QUE NUM ENTAO')
     def condicional(self, p):
@@ -71,7 +72,12 @@ class MatemagicaParser(Parser):
         return f'end'
     
     def operacao_aux(self, p, op):
-        return f'TEMP1 = {p[1]} {op} {p[3]}' if (p[1].isnumeric() and p[3].isnumeric()) else (f'{p[3]} = {p[1]} {op} {p[3]}' if p[1].isnumeric() else f'{p[1]} = {p[1]} {op} {p[3]}')
+        if (p[1].isnumeric() and p[3].isnumeric()):
+            return f'TEMP1 = {p[1]} {op} {p[3]}'
+        elif p[1].isnumeric():
+            return f'{p[3]} = {p[1]} {op} {p[3]}'
+        else:
+            return f'{p[1]} = {p[1]} {op} {p[3]}'
 
 
 if __name__ == '__main__':
