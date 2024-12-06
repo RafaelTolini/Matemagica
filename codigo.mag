@@ -1,0 +1,6 @@
+FACA x SER 10.
+FACA cont SER 1.
+REPITA x VEZES:
+MOSTRE cont.
+SOME cont COM 1.
+FIM
